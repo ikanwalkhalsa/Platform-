@@ -1,6 +1,6 @@
 # video_app
 
-A new Flutter project.
+A new platform aware Flutter project to access the camera, record the video, and save it locally.
 
 ## Getting Started
 
