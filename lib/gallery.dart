@@ -35,12 +35,17 @@ class _GalleryState extends State<Gallery> {
           ),
           trailing: CupertinoButton(
             onPressed: () async {
-              bool? reload = await Navigator.of(context).push(
-                CupertinoPageRoute(builder: (context) {
-                  return Camera();
-                }),
-              );
-              if (reload != null) setState(() {});
+              bool? reload = await Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) {
+                return Camera();
+              }));
+              if (reload != null) {
+                setState(() {
+                  _controller = VideoPlayerController.file(File(vidPath!));
+                  _controller.addListener(() {});
+                  _controller.initialize();
+                });
+              }
             },
             child: Icon(
               CupertinoIcons.camera,
@@ -58,16 +63,23 @@ class _GalleryState extends State<Gallery> {
         ),
       ),
       body: PlatformWidget(
-        cupertino: (_, __) => Expanded(
-          child: Material(
-            type: MaterialType.transparency,
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(vidPath == null
-                  ? 'Recorded video is desplayed here'
-                  : vidPath!),
-            ),
-          ),
+        cupertino: (_, __) => Container(
+          child: vidPath == null
+              ? Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Text(vidPath == null
+                        ? 'Recorded video is desplayed here'
+                        : vidPath!),
+                  ),
+                )
+              : Container(
+                  child: AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  ),
+                ),
         ),
         material: (_, __) => Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,7 +128,6 @@ class _GalleryState extends State<Gallery> {
                         return Camera();
                       }));
                       if (reload != null) {
-                        print(vidPath);
                         setState(() {
                           _controller =
                               VideoPlayerController.file(File(vidPath!));
